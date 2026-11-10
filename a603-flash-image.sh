@@ -7,7 +7,7 @@
 # Linux (initrd), and the board itself finds nvme0n1, writes the GPT from
 # flash_l4t_t234_nvme.xml and writes the partitions. This script checks the result in the log.
 #
-# Usage, with REC shorted to GND and the SSD in the M.2 Key M slot before power-on:
+# Usage, with W7 pin 3 (FORCE_RECOVERY) shorted to pin 4 (GND) and the SSD in the M.2 Key M slot before power-on:
 #   a603-flash-image.sh [-w DIR] [--erase]
 #     -w DIR   work directory used by a603-build-image.sh
 #              (default: WORK_DIR, else the current directory)
@@ -123,4 +123,4 @@ fi
 if [[ -n "$board_log" ]]; then
 	echo "Board log: ${L4T}/${board_log}"
 fi
-echo "Flash finished. Power off, remove the REC-GND short, then power on."
+echo "Flash finished. Power off, remove the W7 pin 3-4 short, then power on."

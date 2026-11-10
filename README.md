@@ -39,22 +39,28 @@ git clone https://github.com/JunghanShin/a603-flash-image.git
 
 ## 사용법
 
+처음부터 첫 부팅까지 따라 하는 전체 순서는 [a603-build-image README의 빠른 시작](https://github.com/JunghanShin/a603-build-image#빠른-시작-처음부터-첫-부팅까지)에 있습니다. 아래는 쓰기 단계만 적은 것입니다.
+
 1. 이미지를 먼저 만듭니다(a603-build-image README 참고).
    ```bash
    ./a603-build-image/a603-build-image.sh -w ~/a603-work
    ```
 2. 보드 전원을 끄고 **NVMe SSD가 M.2 Key M 슬롯에 꽂혀 있는지** 확인합니다. SSD는 전원을 켜기 전에 꽂아야 합니다(핫플러그 안 됨).
-3. **REC 핀과 GND를 쇼트**합니다.
-4. PC와 보드를 micro-USB로 연결하고 전원을 켭니다.
-5. 복구 장치가 **480Mbps**로 잡혔는지 확인합니다. NVIDIA 장치(Orin NX 16GB `0955:7323`, 8GB `0955:7423`)가 `480M`으로 보여야 합니다.
+3. 헤더 **W7의 3번(FORCE_RECOVERY)과 4번(GND)을 쇼트**합니다. A603에는 리커버리 버튼이 없습니다([Seeed 문서](https://wiki.seeedstudio.com/headless_setup_and_recovery_for_a603/)). 쇼트하기 전에 보드 실크 인쇄의 핀 번호를 확인합니다.
+4. PC와 보드를 micro-USB로 연결하고 전원을 켭니다. 2초쯤 지나면 쇼트를 빼도 됩니다.
+5. 가상 머신이면 VMware 메뉴 **VM → Removable Devices → NVIDIA APX → Connect**로 장치를 넘깁니다.
+6. 복구 장치가 **480Mbps**로 잡혔는지 확인합니다. NVIDIA 장치(Orin NX 16GB `0955:7323`, 8GB `0955:7423`)가 `480M`으로 보여야 합니다. Seeed 문서의 `0955:7523`은 Orin Nano 모듈 값입니다.
+   ```bash
+   lsusb | grep 0955
+   ```
    ```bash
    lsusb -t
    ```
-6. 이미지를 만들 때와 **같은 작업 폴더**를 지정해 씁니다.
+7. 이미지를 만들 때와 **같은 작업 폴더**를 지정해 씁니다. 쓰는 도중 보드가 다시 부팅하며 USB 장치가 새로 잡히면 **가상 머신**에 연결합니다.
    ```bash
    ./a603-flash-image/a603-flash-image.sh -w ~/a603-work
    ```
-7. `Flash finished`가 나오면 전원을 끄고 **REC-GND 쇼트를 뺀 뒤** 전원을 켭니다.
+8. `Flash finished`가 나오면 전원을 끄고 **W7 쇼트를 뺀 뒤** 전원을 켭니다.
 
 ## SSD는 어떻게 찾고 포맷하나
 
@@ -99,7 +105,7 @@ SSD는 Jetson의 PCIe에 붙어 있어서 PC에서는 보이지 않습니다. �
 | 증상 | 원인과 조치 |
 |---|---|
 | `Flash images are missing` | 작업 폴더가 다르거나 이미지를 아직 만들지 않았습니다. `-w`로 이미지를 만든 폴더를 지정합니다. |
-| `Need a 480 Mbps recovery device` (`speed=missing`) | 보드가 REC 모드가 아닙니다. 전원을 끄고 REC-GND를 쇼트한 뒤 다시 켭니다. 충전 전용 케이블이면 장치가 안 보입니다. |
+| `Need a 480 Mbps recovery device` (`speed=missing`) | 보드가 리커버리 모드가 아닙니다. 전원을 끄고 W7 3번–4번을 쇼트한 뒤 다시 켭니다. 가상 머신이면 장치를 가상 머신에 연결했는지 확인합니다. 충전 전용 케이블이면 장치가 안 보입니다. |
 | `Need a 480 Mbps recovery device` (`speed=5000` 등) | USB 3.x 속도로 잡혔습니다. PC의 다른 USB 포트(USB 2.0)나 USB 2.0 허브를 씁니다. |
 | `The board did not find the NVMe SSD` | SSD가 덜 꽂혔거나 SATA M.2입니다. 전원을 끄고 NVMe SSD를 다시 꽂은 뒤 REC 모드로 켭니다. |
 | `no success message was found` | 오류 없이 끝났지만 로그에서 성공을 확인하지 못했습니다. `flash-image.log`와 보드 로그를 확인한 뒤 부팅합니다. |
